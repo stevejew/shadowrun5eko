@@ -17,7 +17,7 @@
   "packs": [],
   "dependencies": [],
 	"url" : "https://github.com/stevejew/shadowrun5eko",
-	"download" : "https://github.com/stevejew/shadowrun5eko/releases/download/1.1/SR5ko.zip",
+	"download" : "https://github.com/stevejew/shadowrun5eko/releases/download/1.0/SR5ko.zip",
 	"manifest" : "https://github.com/stevejew/shadowrun5eko/releases/latest/download/module.json",
   "minimumCoreVersion": "0.18.2",
   "compatibleCoreVersion": "11"
