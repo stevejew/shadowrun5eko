@@ -431,7 +431,7 @@
         "MissingHost": "호스트 물품을 끌어서 놓기",
         "Type": "유형",
         "Types": {
-            "Acid": "산성",
+            "Acid": "애시드",
             "Binder": "바인더",
             "BlackIC": "블랙IC",
             "Blaster": "블래스터",
@@ -444,7 +444,7 @@
             "Scramble": "스크램블",
             "Sparky": "스파키",
             "TarBaby": "탈 베이비",
-            "Track": "추적기"
+            "Track": "트랙"
         }
     },
     "SR5.Import": {
