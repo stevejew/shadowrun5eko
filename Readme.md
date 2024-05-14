@@ -6,3 +6,7 @@
 * 매니페스트： https://github.com/stevejew/shadowrun5eko/releases/latest/download/module.json
 
 오역, 오탈자, 어색한 번역 등 문제가 있을 경우 제보 부탁드립니다.
+
+
+### 용어집
+https://github.com/stevejew/shadowrun5eko/wiki
