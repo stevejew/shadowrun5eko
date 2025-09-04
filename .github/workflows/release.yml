@@ -16,26 +16,33 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set version from tag
-        id: get_version
-        run: echo "version=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+- name: Set version from tag
+  id: get_version
+  run: |
+    echo "TAG REF: $GITHUB_REF"       # 디버그용
+    VERSION=${GITHUB_REF#refs/tags/v}
+    echo "version=$VERSION" >> $GITHUB_OUTPUT
 
-      - name: Update module.json (safe JSON edit)
-        run: |
-          node <<'EOF'
-          const fs = require('fs');
-          const path = 'module.json';
-          const version = process.env.VERSION;
 
-          const json = JSON.parse(fs.readFileSync(path, 'utf8'));
-          json.version = version;
-          json.download = `https://github.com/${process.env.GITHUB_REPOSITORY}/releases/download/v${version}/SR5ko.zip`;
+- name: Update module.json
+  run: |
+    node <<'EOF'
+    const fs = require('fs');
+    const version = process.env.VERSION;
+    const path = 'module.json';
 
-          fs.writeFileSync(path, JSON.stringify(json, null, 2), 'utf8');
-          EOF
-        env:
-          VERSION: ${{ steps.get_version.outputs.version }}
-          GITHUB_REPOSITORY: ${{ github.repository }}
+    const json = JSON.parse(fs.readFileSync(path,'utf8'));
+    console.log("Old version:", json.version);
+
+    json.version = version;
+    json.download = `https://github.com/${process.env.GITHUB_REPOSITORY}/releases/download/v${version}/SR5ko.zip`;
+
+    fs.writeFileSync(path, JSON.stringify(json, null, 2), 'utf8');
+    console.log("New version:", json.version);
+    EOF
+  env:
+    VERSION: ${{ steps.get_version.outputs.version }}
+    GITHUB_REPOSITORY: ${{ github.repository }}
 
       - name: Zip module
         run: |
