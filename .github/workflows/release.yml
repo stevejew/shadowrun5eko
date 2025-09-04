@@ -5,6 +5,11 @@ on:
     tags:
       - 'v*.*.*'   # 예: v1.6.1 같은 태그를 push하면 실행됨
 
+permissions:
+  contents: write
+  packages: write
+  actions: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
