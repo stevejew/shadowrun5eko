@@ -3,7 +3,7 @@ name: Release FVTT Module
 on:
   push:
     tags:
-      - 'v*.*.*'   # 예: v1.2.4
+      - 'v*.*.*'
 
 permissions:
   contents: write
@@ -16,27 +16,25 @@ jobs:
     env:
       GITHUB_TOKEN: ${{ secrets.MY_PERSONAL_TOKEN }}
     steps:
-      # 소스코드 체크아웃
       - uses: actions/checkout@v4
 
-      # 태그에서 버전 추출
+      # 1. 태그에서 버전 추출
       - name: Set version from tag
         id: get_version
         run: |
-          echo "TAG REF: $GITHUB_REF"
           VERSION=${GITHUB_REF#refs/tags/v}
           echo "version=$VERSION" >> $GITHUB_OUTPUT
 
-      # module.json 갱신 (version, download URL, manifest, id 유지)
+      # 2. module.json 갱신 (version, download, manifest, id만)
       - name: Update module.json
         run: |
           node <<'EOF'
           const fs = require('fs');
+          const { execSync } = require('child_process');
           const version = process.env.VERSION;
           const path = 'module.json';
 
           const json = JSON.parse(fs.readFileSync(path,'utf8'));
-          console.log("Old version:", json.version);
 
           // version 갱신
           json.version = version;
@@ -47,24 +45,28 @@ jobs:
           // manifest URL 갱신
           json.manifest = `https://github.com/${process.env.GITHUB_REPOSITORY}/releases/latest/download/module.json`;
 
-          // id 필드가 없으면 추가
-          if (!json.id) {
-            json.id = "shadowrun5eko";
-          }
+          // id 유지/추가
+          if (!json.id) json.id = "shadowrun5eko";
 
           fs.writeFileSync(path, JSON.stringify(json, null, 2), 'utf8');
-          console.log("New version:", json.version);
+
+          // 저장소 커밋
+          execSync('git config user.name "github-actions"');
+          execSync('git config user.email "github-actions@github.com"');
+          execSync(`git add ${path}`);
+          execSync(`git commit -m "Auto update module.json for v${version}"`);
+          execSync('git push');
           EOF
         env:
           VERSION: ${{ steps.get_version.outputs.version }}
           GITHUB_REPOSITORY: ${{ github.repository }}
 
-      # ZIP 빌드
+      # 3. ZIP 빌드
       - name: Build module ZIP
         run: |
           zip -r SR5ko.zip . -x ".git/*" ".github/*"
 
-      # Release 생성 및 파일 업로드
+      # 4. Release 생성 및 파일 업로드
       - name: Create Release
         uses: softprops/action-gh-release@v2
         with:
