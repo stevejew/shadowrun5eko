@@ -3,7 +3,7 @@ name: Release FVTT Module
 on:
   push:
     tags:
-      - 'v*.*.*'   # 반드시 v숫자.숫자.숫자 형태
+      - 'v*.*.*'   # 반드시 v숫자.숫자.숫자 형식의 태그 푸시 시 실행
 
 permissions:
   contents: write
@@ -19,7 +19,7 @@ jobs:
       # 1. 저장소 체크아웃
       - uses: actions/checkout@v4
 
-      # 2. 태그에서 버전 추출 및 검사
+      # 2. 태그에서 version 추출
       - name: Set version from tag
         id: get_version
         run: |
@@ -33,7 +33,7 @@ jobs:
           echo "version=$VERSION" >> $GITHUB_OUTPUT
           echo "Extracted version: $VERSION"
 
-      # 3. module.json 복사 및 갱신 (Release용)
+      # 3. Release용 module.json 준비 및 갱신
       - name: Prepare module.json for Release
         run: |
           mkdir release
@@ -51,7 +51,7 @@ jobs:
           const path = 'module.json';
           const json = JSON.parse(fs.readFileSync(path,'utf8'));
 
-          // Release용 항목 갱신
+          // version, download, manifest, id 갱신
           json.version = version;
           json.download = `https://github.com/${process.env.GITHUB_REPOSITORY}/releases/download/v${version}/SR5ko.zip`;
           json.manifest = `https://github.com/${process.env.GITHUB_REPOSITORY}/releases/latest/download/module.json`;
@@ -60,6 +60,10 @@ jobs:
           fs.writeFileSync(path, JSON.stringify(json, null, 2), 'utf8');
           EOF
           cd ..
+
+        env:
+          VERSION: ${{ steps.get_version.outputs.version }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
 
       # 4. ZIP 빌드
       - name: Build module ZIP
