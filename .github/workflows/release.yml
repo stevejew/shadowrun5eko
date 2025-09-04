@@ -1,9 +1,10 @@
 name: Release FVTT Module
 
+# 태그 푸시 이벤트에서만 실행
 on:
   push:
     tags:
-      - 'v*.*.*'
+      - 'v*.*.*'   # 예: v1.2.4
 
 permissions:
   contents: write
@@ -14,10 +15,13 @@ jobs:
   build:
     runs-on: ubuntu-latest
     env:
+      # GitHub Secrets에 등록한 PAT 사용
       GITHUB_TOKEN: ${{ secrets.MY_PERSONAL_TOKEN }}
     steps:
+      # 소스코드 체크아웃
       - uses: actions/checkout@v4
 
+      # 태그에서 버전 추출
       - name: Set version from tag
         id: get_version
         run: |
@@ -25,6 +29,7 @@ jobs:
           VERSION=${GITHUB_REF#refs/tags/v}
           echo "version=$VERSION" >> $GITHUB_OUTPUT
 
+      # module.json 버전과 download URL 갱신
       - name: Update module.json
         run: |
           node <<'EOF'
@@ -37,6 +42,7 @@ jobs:
 
           json.version = version;
           json.download = `https://github.com/${process.env.GITHUB_REPOSITORY}/releases/download/v${version}/SR5ko.zip`;
+          json.manifest = `https://github.com/${process.env.GITHUB_REPOSITORY}/releases/latest/download/module.json`;
 
           fs.writeFileSync(path, JSON.stringify(json, null, 2), 'utf8');
           console.log("New version:", json.version);
@@ -45,10 +51,12 @@ jobs:
           VERSION: ${{ steps.get_version.outputs.version }}
           GITHUB_REPOSITORY: ${{ github.repository }}
 
-      - name: Zip module
+      # ZIP 빌드 (ko.json 포함)
+      - name: Build module ZIP
         run: |
           zip -r SR5ko.zip . -x ".git/*" ".github/*"
 
+      # Release 생성 및 파일 업로드
       - name: Create Release
         uses: softprops/action-gh-release@v2
         with:
