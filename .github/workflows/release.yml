@@ -3,7 +3,7 @@ name: Release FVTT Module
 on:
   push:
     tags:
-      - 'v*.*.*'   # 태그 푸시 시 실행
+      - 'v*.*.*'   # 반드시 v숫자.숫자.숫자 형태
 
 permissions:
   contents: write
@@ -19,18 +19,19 @@ jobs:
       # 1. 저장소 체크아웃
       - uses: actions/checkout@v4
 
-      # 2. 태그에서 버전 추출
+      # 2. 태그에서 버전 추출 및 검사
       - name: Set version from tag
         id: get_version
         run: |
           echo "GITHUB_REF=$GITHUB_REF"
-          if [[ "$GITHUB_REF" =~ refs/tags/v(.+) ]]; then
+          if [[ "$GITHUB_REF" =~ refs/tags/v([0-9]+\.[0-9]+\.[0-9]+) ]]; then
             VERSION="${BASH_REMATCH[1]}"
           else
-            echo "Error: Tag not found or invalid format"
+            echo "::error ::Invalid tag format. Use vX.Y.Z"
             exit 1
           fi
           echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Extracted version: $VERSION"
 
       # 3. module.json 복사 및 갱신 (Release용)
       - name: Prepare module.json for Release
@@ -50,7 +51,7 @@ jobs:
           const path = 'module.json';
           const json = JSON.parse(fs.readFileSync(path,'utf8'));
 
-          // version, download, manifest, id 갱신
+          // Release용 항목 갱신
           json.version = version;
           json.download = `https://github.com/${process.env.GITHUB_REPOSITORY}/releases/download/v${version}/SR5ko.zip`;
           json.manifest = `https://github.com/${process.env.GITHUB_REPOSITORY}/releases/latest/download/module.json`;
