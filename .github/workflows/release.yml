@@ -16,60 +16,47 @@ jobs:
     env:
       GITHUB_TOKEN: ${{ secrets.MY_PERSONAL_TOKEN }}
     steps:
+      # 1. 저장소 체크아웃
       - uses: actions/checkout@v4
 
-      # 1. 태그에서 버전 추출
+      # 2. 태그에서 버전 추출
       - name: Set version from tag
         id: get_version
         run: |
           VERSION=${GITHUB_REF#refs/tags/v}
           echo "version=$VERSION" >> $GITHUB_OUTPUT
 
-      # 2. module.json 갱신 (version, download, manifest, id만)
-      - name: Update module.json
+      # 3. module.json 복사 및 갱신 (Release용)
+      - name: Prepare module.json for Release
         run: |
+          mkdir release
+          cp module.json release/module.json
+          cd release
           node <<'EOF'
           const fs = require('fs');
-          const { execSync } = require('child_process');
           const version = process.env.VERSION;
           const path = 'module.json';
-
           const json = JSON.parse(fs.readFileSync(path,'utf8'));
 
-          // version 갱신
+          // Release에 필요한 항목만 갱신
           json.version = version;
-
-          // download URL 갱신
           json.download = `https://github.com/${process.env.GITHUB_REPOSITORY}/releases/download/v${version}/SR5ko.zip`;
-
-          // manifest URL 갱신
           json.manifest = `https://github.com/${process.env.GITHUB_REPOSITORY}/releases/latest/download/module.json`;
-
-          // id 유지/추가
           if (!json.id) json.id = "shadowrun5eko";
 
           fs.writeFileSync(path, JSON.stringify(json, null, 2), 'utf8');
-
-          // 저장소 커밋
-          execSync('git config user.name "github-actions"');
-          execSync('git config user.email "github-actions@github.com"');
-          execSync(`git add ${path}`);
-          execSync(`git commit -m "Auto update module.json for v${version}"`);
-          execSync('git push');
           EOF
-        env:
-          VERSION: ${{ steps.get_version.outputs.version }}
-          GITHUB_REPOSITORY: ${{ github.repository }}
+          cd ..
 
-      # 3. ZIP 빌드
+      # 4. ZIP 빌드
       - name: Build module ZIP
         run: |
           zip -r SR5ko.zip . -x ".git/*" ".github/*"
 
-      # 4. Release 생성 및 파일 업로드
+      # 5. Release 생성 및 파일 업로드
       - name: Create Release
         uses: softprops/action-gh-release@v2
         with:
           files: |
             SR5ko.zip
-            module.json
+            release/module.json
