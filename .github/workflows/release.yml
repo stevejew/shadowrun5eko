@@ -3,7 +3,7 @@ name: Release FVTT Module
 on:
   push:
     tags:
-      - 'v*.*.*'
+      - 'v*.*.*'   # 태그 푸시 시 실행
 
 permissions:
   contents: write
@@ -23,7 +23,13 @@ jobs:
       - name: Set version from tag
         id: get_version
         run: |
-          VERSION=${GITHUB_REF#refs/tags/v}
+          echo "GITHUB_REF=$GITHUB_REF"
+          if [[ "$GITHUB_REF" =~ refs/tags/v(.+) ]]; then
+            VERSION="${BASH_REMATCH[1]}"
+          else
+            echo "Error: Tag not found or invalid format"
+            exit 1
+          fi
           echo "version=$VERSION" >> $GITHUB_OUTPUT
 
       # 3. module.json 복사 및 갱신 (Release용)
@@ -35,10 +41,16 @@ jobs:
           node <<'EOF'
           const fs = require('fs');
           const version = process.env.VERSION;
+
+          if (!version) {
+            console.error("VERSION is undefined. Exiting.");
+            process.exit(1);
+          }
+
           const path = 'module.json';
           const json = JSON.parse(fs.readFileSync(path,'utf8'));
 
-          // Release에 필요한 항목만 갱신
+          // version, download, manifest, id 갱신
           json.version = version;
           json.download = `https://github.com/${process.env.GITHUB_REPOSITORY}/releases/download/v${version}/SR5ko.zip`;
           json.manifest = `https://github.com/${process.env.GITHUB_REPOSITORY}/releases/latest/download/module.json`;
