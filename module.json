@@ -1,24 +1,28 @@
 {
-	"name": "shadowrun5eko",
-	"title": "Shadowrun 5E Korean",
-	"description": "Shadowrun 5판 한글 번역",
-	"version": "1.6",
-	"author": "",
-	"languages": [
-		{
-			"lang": "ko",
-			"system":"shadowrun5e",
-			"name": "한글",
-			"path": "lang/ko.json"
-		}
-	],
-	"scripts": [],
-  "styles" : [],
-  "packs": [],
+  "id": "shadowrun5eko",
+  "title": "섀도우런 5판 한글",
+  "description": "섀도우런 5판 한글화 모듈",
+  "authors": [
+    {
+      "name": "stevejew"
+    }
+  ],
+  "version": "1.0.0",
+  "compatibility": {
+    "minimum": "13",
+    "verified": "13"
+  },
+  "languages": [
+    {
+      "lang": "ko",
+      "system": "shadowrun5e",
+      "name": "한글",
+      "path": "lang/ko.json"
+    }
+  ],
+  "scripts": [],
   "dependencies": [],
-	"url" : "https://github.com/stevejew/shadowrun5eko",
-	"download" : "https://github.com/stevejew/shadowrun5eko/releases/download/1.1.1/SR5ko.zip",
-	"manifest" : "https://github.com/stevejew/shadowrun5eko/releases/latest/download/module.json",
-  "minimumCoreVersion": "13",
-  "compatibleCoreVersion": "13"
+  "url": "https://github.com/stevejew/shadowrun5eko",
+  "download": "https://github.com/stevejew/shadowrun5eko/releases/download/v1.0.0/SR5ko.zip",
+  "manifest": "https://github.com/stevejew/shadowrun5eko/releases/latest/download/module.json"
 }
