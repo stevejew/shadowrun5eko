@@ -47,3 +47,6 @@ jobs:
           files: |
             SR5ko.zip
             module.json
+
+  env:
+    GITHUB_TOKEN: ${{ secrets.MY_PERSONAL_TOKEN }}
