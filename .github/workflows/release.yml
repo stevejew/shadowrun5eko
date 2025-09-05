@@ -33,38 +33,41 @@ jobs:
           echo "version=$VERSION" >> $GITHUB_OUTPUT
           echo "Extracted version: $VERSION"
 
-      # 3. Release용 module.json 준비 및 갱신
-      - name: Prepare module.json for Release
+      # 3. Release용 module.json 갱신
+      - name: Update module.json for Release
         run: |
-          mkdir release
-          cp module.json release/module.json
-          cd release
           node <<'EOF'
           const fs = require('fs');
+          const path = 'module.json';
           const version = process.env.VERSION;
+          const repo = process.env.GITHUB_REPOSITORY;
 
-          if (!version) {
-            console.error("VERSION is undefined. Exiting.");
+          if (!version || !repo) {
+            console.error("VERSION or GITHUB_REPOSITORY is undefined. Exiting.");
             process.exit(1);
           }
 
-          const path = 'module.json';
-          const json = JSON.parse(fs.readFileSync(path,'utf8'));
+          try {
+            const json = JSON.parse(fs.readFileSync(path, 'utf8'));
 
-          // version, download, manifest, id 갱신
-          json.version = version;
-          json.download = `https://github.com/${process.env.GITHUB_REPOSITORY}/releases/download/${version}/SR5ko.zip`;
-          json.manifest = `https://github.com/${process.env.GITHUB_REPOSITORY}/releases/latest/download/module.json`;
-          if (!json.id) json.id = "shadowrun5eko";
+            // version, download, manifest, id 갱신
+            json.version = version;
+            json.download = `https://github.com/${repo}/releases/download/${version}/SR5ko.zip`;
+            json.manifest = `https://github.com/${repo}/releases/latest/download/module.json`;
+            if (!json.id) json.id = "shadowrun5eko";
 
-          fs.writeFileSync(path, JSON.stringify(json, null, 2), 'utf8');
+            fs.writeFileSync(path, JSON.stringify(json, null, 2), 'utf8');
+            console.log("module.json updated successfully.");
+          } catch (error) {
+            console.error(`Failed to update module.json: ${error.message}`);
+            process.exit(1);
+          }
           EOF
-          cd ..
         env:
           VERSION: ${{ steps.get_version.outputs.version }}
           GITHUB_REPOSITORY: ${{ github.repository }}
 
-      # 4. ZIP 빌드
+      # 4. ZIP 빌드 (업데이트된 module.json 포함)
       - name: Build module ZIP
         run: |
           zip -r SR5ko.zip . -x ".git/*" ".github/*"
@@ -75,4 +78,4 @@ jobs:
         with:
           files: |
             SR5ko.zip
-            release/module.json
+            module.json
