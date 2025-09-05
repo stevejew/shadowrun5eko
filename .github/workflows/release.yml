@@ -3,7 +3,7 @@ name: Release FVTT Module
 on:
   push:
     tags:
-      - '*.*.*'   # 반드시 v숫자.숫자.숫자 형식의 태그 푸시 시 실행
+      - '*.*.*'  # v 접두사 없이 숫자.숫자.숫자 형식의 태그 푸시 시 실행
 
 permissions:
   contents: write
@@ -24,10 +24,10 @@ jobs:
         id: get_version
         run: |
           echo "GITHUB_REF=$GITHUB_REF"
-          if [[ "$GITHUB_REF" =~ refs/tags/v([0-9]+\.[0-9]+\.[0-9]+) ]]; then
+          if [[ "$GITHUB_REF" =~ refs/tags/([0-9]+\.[0-9]+\.[0-9]+) ]]; then
             VERSION="${BASH_REMATCH[1]}"
           else
-            echo "::error ::Invalid tag format. Use vX.Y.Z"
+            echo "::error ::Invalid tag format. Use X.Y.Z"
             exit 1
           fi
           echo "version=$VERSION" >> $GITHUB_OUTPUT
@@ -53,14 +53,13 @@ jobs:
 
           // version, download, manifest, id 갱신
           json.version = version;
-          json.download = `https://github.com/${process.env.GITHUB_REPOSITORY}/releases/download/v${version}/SR5ko.zip`;
+          json.download = `https://github.com/${process.env.GITHUB_REPOSITORY}/releases/download/${version}/SR5ko.zip`;
           json.manifest = `https://github.com/${process.env.GITHUB_REPOSITORY}/releases/latest/download/module.json`;
           if (!json.id) json.id = "shadowrun5eko";
 
           fs.writeFileSync(path, JSON.stringify(json, null, 2), 'utf8');
           EOF
           cd ..
-
         env:
           VERSION: ${{ steps.get_version.outputs.version }}
           GITHUB_REPOSITORY: ${{ github.repository }}
