@@ -3,7 +3,7 @@ name: Release FVTT Module
 on:
   push:
     tags:
-      - '*.*.*'   # 반드시 v숫자.숫자.숫자 형식의 태그 푸시 시 실행
+      - 'v*.*.*'   # 반드시 v숫자.숫자.숫자 형식의 태그 푸시 시 실행
 
 permissions:
   contents: write
