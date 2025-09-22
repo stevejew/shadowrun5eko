@@ -758,7 +758,7 @@
             "ActorSheet": {
                 "AddNetwork": "직접 연결 네트워크",
                 "ColdSim": "콜드 심",
-                "Compilations": "Compilations",
+                "Compilations": "컴파일 모음",
                 "ConnectToDriver": "조종자에게 연결",
                 "CreateInventory": "물품 보관 장소 생성",
                 "CritterPowers": "생명체 능력",
@@ -766,7 +766,7 @@
                 "DeviceSetup": "장치 설정",
                 "DisabledOptionCritterPowers": "추가 생명체 능력 - 사용 불가능",
                 "DisabledOptionSpritePowers": "추가 요정 능력 - 사용 불가능",
-                "DisplayingPersona": "Displaying Persona",
+                "DisplayingPersona": "페르소나 표시",
                 "EnabledOptionCritterPowers": "추가 생명체 능력 - 사용 가능",
                 "EnabledOptionSpritePowers": "추가 요정 능력 - 사용 가능",
                 "Hacking": "해킹",
