@@ -903,8 +903,8 @@
             "IsOptional": "능력 설정",
             "Karma": "카르마",
             "Optional": {
-                "DisabledOption": "추가 능력, 사용 가능",
-                "EnabledOption": "추가 능력, 사용 불가능",
+                "DisabledOption": "추가 능력, 사용 불가능",
+                "EnabledOption": "추가 능력, 사용 가능",
                 "Standard": "기본"
             },
             "Range": "사거리",
@@ -3080,4 +3080,5 @@
             "weapon": "무기"
         }
     }
+
 }
